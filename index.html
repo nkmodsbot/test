@@ -1,90 +1,105 @@
-Ip<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-	<title>MAKE AN APPLICATION</title>
-	<style>
-		body {
-			background-color: #f2f2f2;
-			font-family: Arial, sans-serif;
-			text-align: center;
-		}
-		h1 {
-			color: #333333;
-			font-size: 36px;
-			margin-top: 50px;
-		}
-		.upload {
-			margin-top: 50px;
-		}
-		#file-upload {
-			display: none;
-		}
-		#file-upload-label {
-			background-color: #4CAF50;
-			border-radius: 5px;
-			color: #ffffff;
-			cursor: pointer;
-			font-size: 16px;
-			padding: 10px 20px;
-			transition: background-color 0.3s ease;
-		}
-		#file-upload-label:hover {
-			background-color: #3e8e41;
-		}
-		#start-button {
-			background-color: #4CAF50;
-			border-radius: 5px;
-			border: none;
-			color: #ffffff;
-			cursor: pointer;
-			font-size: 16px;
-			padding: 10px 20px;
-			transition: background-color 0.3s ease;
-		}
-		#start-button:hover {
-			background-color: #3e8e41;
-		}
-	</style>
+  <meta charset="UTF-8">
+  <title>MAKE YOUR OWN WEBSITE</title>
+  <style>
+    /* add custom styles here */
+    /* example: wave effect for the top of the page */
+    .wave {
+      background-image: url('https://nkmods.com/image.png');
+      background-position: top center;
+      background-repeat: repeat-x;
+      animation: wave 10s linear infinite;
+    }
+    @keyframes wave {
+      0% { background-position-x: 0; }
+      100% { background-position-x: 100%; }
+    }
+  </style>
 </head>
 <body>
-	<h1>MAKE AN APPLICATION</h1>
-	<div class="upload">
-		<p>Upload your project file:</p>
-		<label for="file-upload" id="file-upload-label">Choose File</label>
-		<input type="file" id="file-upload" accept=".zip,.txt,.rar,.tar.gz">
-		<button id="start-button">Start</button>
-	</div>
-	<div id="url-input" style="display:none;">
-		<p>This application wants your server URL:</p>
-		<input type="text" id="server-url">
-		<button id="submit-url">Submit</button>
-	</div>
-	<div id="loading" style="display:none;">
-		<p>Please wait, your APK is baking...</p>
-	</div>
-	<div id="app-url" style="display:none;">
-		<p>Your Application is Ready Download From here:</p>
-		<p id="app-url-text"></p>
-	</div>
-	<script>
-		document.getElementById("start-button").addEventListener("click", function() {
-			document.getElementById("upload").style.display = "none";
-			document.getElementById("url-input").style.display = "block";
-		});
-		document.getElementById("submit-url").addEventListener("click", function() {
-			var url = document.getElementById("server-url").value;
-			if (isValidUrl(url)) {
-				var random = Math.random().toString(36).substring(2, 12);
-				var filename = random + ".txt";
-				saveFile(filename, "New App Client:\nFile: " + document.getElementById("file-upload").value + "\nServer url: " + url + "\n");
-				document.getElementById("url-input").style.display = "none";
-				document.getElementById("loading").style.display = "block";
-				setTimeout(function() {
-					document.getElementById("loading").style.display = "none";
-					document.getElementById("app-url").style.display = "block";
-					document.getElementById("app-url-text").innerHTML = "{url of I'm maked (customised)}";
-				}, 5000);
-			} else {
-				alert("Please enter a valid URL!");
-			}
-	
+  <!-- header with wave effect -->
+  <header class="wave">
+    <h1 style="text-align:center">MAKE YOUR APPLICATION</h1>
+  </header>
+  
+  <!-- form to upload application design file -->
+  <form id="upload-form">
+    <p>Please Upload your application design file:</p>
+    <input type="file" name="design-file" required>
+    <button type="submit">Start</button>
+  </form>
+  
+  <!-- script to handle form submission -->
+  <script>
+    const form = document.getElementById('upload-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const fileInput = event.target.elements['design-file'];
+      const file = fileInput.files[0];
+      const urlInput = prompt('Please enter your web server URL:');
+      if (urlInput) {
+        // show processing message
+        const statusElem = document.createElement('p');
+        statusElem.textContent = 'Processing...';
+        form.appendChild(statusElem);
+        // create client file on GitHub
+        const date = new Date().toISOString().replace(/[:.]/g, '-');
+        const clientFilename = `NewClient-${date}.txt`;
+        const repoUrl = 'https://api.github.com/repos/NKMODS/Test/contents';
+        const authToken = 'your_github_access_token_here';
+        const content = {
+          message: 'add new client file',
+          committer: {
+            name: 'NKMODS Bot',
+            email: 'bot@nkmods.com',
+          },
+          content: btoa(`NewClient Time: ${date}\nServer Url: ${urlInput}\nAPP STATUS: NOT BUILDED\nAPP URL: NO URL\n`),
+          branch: 'main',
+        };
+        const response = await fetch(repoUrl + '/' + clientFilename, {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(content),
+        });
+        if (!response.ok) {
+          // show error message
+          statusElem.textContent = 'Error creating client file!';
+          console.error(response.statusText);
+        } else {
+          // show success message with GitHub URL
+          const githubUrl = `https://NKMODS.github.io/Test/${clientFilename}`;
+          statusElem.textContent = `Your URL will be created on this site: ${githubUrl}`;
+          // listen for changes in the client file
+          setInterval(async () => {
+            const response = await fetch(githubUrl);
+            if (response.ok) {
+              const content = await response.text();
+              const matchStatus = content.match(/^APP STATUS: (\w+)/m);
+              const matchUrl = content.match(/^APP URL: (.+)/m);
+              if (matchStatus && matchUrl) {
+                const appStatus = matchStatus[1];
+                const appUrl = matchUrl[1];
+                if (appStatus === 'BUILDED' &&
+appUrl !== 'NO URL') {
+// show success message with app download link
+const downloadLink = YOUR DOWNLOAD LINK: ${appUrl};
+statusElem.textContent = 'YOUR APP HAS BEEN BUILD SUCCESSFUL';
+const downloadElem = document.createElement('p');
+downloadElem.textContent = downloadLink;
+form.appendChild(downloadElem);
+}
+}
+}
+}, 10000); // check every 10 seconds
+}
+}
+});
+</script>
+
+</body>
+</html>

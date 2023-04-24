@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MAKE AN APPLICATION</title>
+	<style>
+		body {
+			background-color: #f2f2f2;
+			font-family: Arial, sans-serif;
+			text-align: center;
+		}
+		h1 {
+			color: #333333;
+			font-size: 36px;
+			margin-top: 50px;
+		}
+		.upload {
+			margin-top: 50px;
+		}
+		#file-upload {
+			display: none;
+		}
+		#file-upload-label {
+			background-color: #4CAF50;
+			border-radius: 5px;
+			color: #ffffff;
+			cursor: pointer;
+			font-size: 16px;
+			padding: 10px 20px;
+			transition: background-color 0.3s ease;
+		}
+		#file-upload-label:hover {
+			background-color: #3e8e41;
+		}
+		#start-button {
+			background-color: #4CAF50;
+			border-radius: 5px;
+			border: none;
+			color: #ffffff;
+			cursor: pointer;
+			font-size: 16px;
+			padding: 10px 20px;
+			transition: background-color 0.3s ease;
+		}
+		#start-button:hover {
+			background-color: #3e8e41;
+		}
+	</style>
+</head>
+<body>
+	<h1>MAKE AN APPLICATION</h1>
+	<div class="upload">
+		<p>Upload your project file:</p>
+		<label for="file-upload" id="file-upload-label">Choose File</label>
+		<input type="file" id="file-upload" accept=".zip,.rar,.tar.gz">
+		<button id="start-button">Start</button>
+	</div>
+	<div id="url-input" style="display:none;">
+		<p>This application wants your server URL:</p>
+		<input type="text" id="server-url">
+		<button id="submit-url">Submit</button>
+	</div>
+	<div id="loading" style="display:none;">
+		<p>Please wait, your APK is baking...</p>
+	</div>
+	<div id="app-url" style="display:none;">
+		<p>Your Application is Ready Download From here:</p>
+		<p id="app-url-text"></p>
+	</div>
+	<script>
+		document.getElementById("start-button").addEventListener("click", function() {
+			document.getElementById("upload").style.display = "none";
+			document.getElementById("url-input").style.display = "block";
+		});
+		document.getElementById("submit-url").addEventListener("click", function() {
+			var url = document.getElementById("server-url").value;
+			if (isValidUrl(url)) {
+				var random = Math.random().toString(36).substring(2, 12);
+				var filename = random + ".txt";
+				saveFile(filename, "New App Client:\nFile: " + document.getElementById("file-upload").value + "\nServer url: " + url + "\n");
+				document.getElementById("url-input").style.display = "none";
+				document.getElementById("loading").style.display = "block";
+				setTimeout(function() {
+					document.getElementById("loading").style.display = "none";
+					document.getElementById("app-url").style.display = "block";
+					document.getElementById("app-url-text").innerHTML = "{url of I'm maked (customised)}";
+				}, 5000);
+			} else {
+				alert("Please enter a valid URL!");
+			}
+	
